@@ -1,0 +1,24 @@
+#!/bin/bash
+declare -r info_file='/etc/mercury'
+source $info_file
+if [ $? -ne 0 ]; then
+  echo "info file not found: $info_file"
+  exit 1
+fi
+
+hour=$( ps -ux | grep $instance_ip | grep -v grep | awk '{print $9}' )
+if [ $? -ne 0 ]; then
+  echo "not checked"
+  exit 1
+fi
+
+if [[ "$hour" = *":"* ]]; then
+  echo "mercury active since $hour"
+elif [[ "$hour" = "" ]]; then
+  echo "mercury passive"
+else
+  echo "not checked"
+  exit 1
+fi
+
+exit 0

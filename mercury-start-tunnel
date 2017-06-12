@@ -1,0 +1,15 @@
+#!/bin/bash
+declare -r info_file='/etc/mercury'
+source $info_file
+if [ $? -ne 0 ]; then
+  echo "info file not found: $info_file"
+  exit 1
+fi
+
+ssh -D 8080 -f -C -q -N -i $identity_file_path -p 22 ubuntu@$instance_ip
+if [ $? -ne 0 ]; then
+  echo "not started"
+  exit 1
+fi
+
+exit 0

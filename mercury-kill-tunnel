@@ -1,0 +1,15 @@
+#!/bin/bash
+declare -r info_file='/etc/mercury'
+source $info_file
+if [ $? -ne 0 ]; then
+  echo "info file not found: $info_file"
+  exit 1
+fi
+
+ps -x | grep $instance_ip | grep -v grep | awk '{print $1}' | xargs kill -9
+if [ $? -ne 0 ]; then
+  echo "not killed"
+  exit 1
+fi
+
+exit 0

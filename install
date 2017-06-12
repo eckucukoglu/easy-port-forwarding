@@ -1,0 +1,60 @@
+#!/bin/bash
+declare -r info_file='/etc/mercury'
+declare -r install_path='/usr/local/bin/'
+declare -r script_names_prefix='mercury-'
+
+uninstall () {
+  rm -rf $install_path$script_names_prefix*
+  rm -rf $info_file
+  if [[ $? -eq 0 ]]; then
+    echo "uninstalled"
+    exit 0
+  else
+    echo "not uninstalled"
+    exit 1
+  fi
+}
+
+while [ $# -gt 0 ]; do
+  case $1 in
+    -u)
+      uninstall
+      ;;
+    *)
+      echo "unknown parameter"
+      exit 1
+  esac
+done
+
+read -p 'instance ip: ' instance_ip
+read -p 'identity file path: ' identity_file_path
+echo "instance_ip='$instance_ip'" > $info_file
+echo "identity_file_path='$identity_file_path'" >> $info_file
+
+if [[ $? -eq 0 ]]; then
+  echo "info file generated: $info_file"
+else
+  echo "not installed" >&2
+  exit 1
+fi
+
+cp $script_names_prefix* $install_path.
+if [[ $? -eq 0 ]]; then
+  echo "files copied"
+else
+  echo "not installed" >&2
+  rm $info_file
+  exit 1
+fi
+
+chmod +x $install_path$script_names_prefix*
+if [[ $? -eq 0 ]]; then
+  echo "exec roles granted"
+else
+  echo "not installed" >&2
+  rm $info_file
+  exit 1
+fi
+
+echo "installed"
+exit 0

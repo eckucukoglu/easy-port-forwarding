@@ -1,0 +1,62 @@
+#!/bin/bash
+declare -r info_file='/etc/mercury'
+source $info_file
+if [ $? -ne 0 ]; then
+  echo "info file not found: $info_file"
+  exit 1
+fi
+
+hour=$( ps -ux | grep $instance_ip | grep -v grep | awk '{print $9}' )
+if [ $? -ne 0 ]; then
+  echo "not checked&restarted"
+  exit 1
+fi
+
+if [[ "$hour" = *":"* ]]; then
+  echo "mercury active since $hour"
+  end=$( ps -x | grep $instance_ip | grep -v grep | awk '{print $1}' | xargs kill -9 )
+  if [ $? -ne 0 ]; then
+    echo "not killed&restarted"
+    exit 1
+  else
+    echo "mercury killed"
+  fi
+  ssh -D 8080 -f -C -q -N -i $identity_file_path -p 22 ubuntu@$instance_ip
+  if [ $? -ne 0 ]; then
+    echo "not started&restarted"
+    exit 1
+  else
+    echo "mercury started"
+  fi
+  hour2=$( ps -ux | grep $instance_ip | grep -v grep | awk '{print $9}' )
+  if [[ "$hour2" = *":"* ]]; then
+    echo "mercury active since $hour2"
+  elif [[ "$hour2" = "" ]]; then
+    echo "mercury unvoluntarily passive"
+    echo "not restarted"
+    exit 1
+  fi
+
+elif [[ "$hour" = "" ]]; then
+  echo "mercury passive"
+  ssh -D 8080 -f -C -q -N -i $identity_file_path -p 22 ubuntu@$instance_ip
+  if [ $? -ne 0 ]; then
+    echo "not started&restarted"
+    exit 1
+  else
+    echo "mercury started"
+  fi
+  hour2=$( ps -ux | grep $instance_ip | grep -v grep | awk '{print $9}' )
+  if [[ "$hour2" = *":"* ]]; then
+    echo "mercury active since $hour2"
+  elif [[ "$hour2" = "" ]]; then
+    echo "mercury unvoluntarily passive"
+    echo "not restarted"
+    exit 1
+  fi
+else
+  echo "not restarted"
+  exit 1
+fi
+
+exit 0
