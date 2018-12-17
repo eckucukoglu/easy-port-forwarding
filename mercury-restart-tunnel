@@ -21,7 +21,7 @@ if [[ "$hour" = *":"* ]]; then
   else
     echo "mercury killed"
   fi
-  ssh -D 8080 -f -C -q -N -i $identity_file_path -p 22 ubuntu@$instance_ip
+  ssh -D 8080 -f -C -q -N -i $identity_file_path -p 22 $user@$instance_ip
   if [ $? -ne 0 ]; then
     echo "not started&restarted"
     exit 1
@@ -39,7 +39,7 @@ if [[ "$hour" = *":"* ]]; then
 
 elif [[ "$hour" = "" ]]; then
   echo "mercury passive"
-  ssh -D 8080 -f -C -q -N -i $identity_file_path -p 22 ubuntu@$instance_ip
+  ssh -D 8080 -f -C -q -N -i $identity_file_path -p 22 $user@$instance_ip
   if [ $? -ne 0 ]; then
     echo "not started&restarted"
     exit 1

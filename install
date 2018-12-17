@@ -27,6 +27,7 @@ while [ $# -gt 0 ]; do
 done
 
 read -p 'instance ip: ' instance_ip
+read -p 'user: ' user
 read -p 'identity file path: ' identity_file_path
 
 chmod 400 $identity_file_path
@@ -38,6 +39,7 @@ else
 fi
 
 echo "instance_ip='$instance_ip'" > $info_file
+echo "user='$user'" >> $info_file
 echo "identity_file_path='$identity_file_path'" >> $info_file
 if [[ $? -eq 0 ]]; then
   echo "info file generated: $info_file"
