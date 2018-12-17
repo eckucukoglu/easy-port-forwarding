@@ -28,9 +28,17 @@ done
 
 read -p 'instance ip: ' instance_ip
 read -p 'identity file path: ' identity_file_path
+
+chmod 400 $identity_file_path
+if [[ $? -eq 0 ]]; then
+  echo "identity file mode is changed, it is not publicly readable anymore."
+else
+  echo "not installed" >&2
+  exit 1
+fi
+
 echo "instance_ip='$instance_ip'" > $info_file
 echo "identity_file_path='$identity_file_path'" >> $info_file
-
 if [[ $? -eq 0 ]]; then
   echo "info file generated: $info_file"
 else
@@ -53,6 +61,7 @@ if [[ $? -eq 0 ]]; then
 else
   echo "not installed" >&2
   rm $info_file
+  rm -rf $install_path$script_names_prefix*
   exit 1
 fi
 
